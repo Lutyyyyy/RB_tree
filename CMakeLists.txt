@@ -2,15 +2,16 @@ cmake_minimum_required (VERSION 3.14)
 
 project(RB_tree_t VERSION 1.0)
 
-set (
-FLAGS
--Wall
--Wextra
--Wpedantic
--Werror
-)
+if(NOT BUILD_TYPE)
+	set(BUILD_TYPE RELEASE)
+endif()
 
-add_compile_options(${FLAGS})
+if ("${BUILD_TYPE}" STREQUAL "DEBUG")
+    set (OPTIONS -Wall -Wextra -Wpedantic -Werror -DDEBUG_MODE)
+else ()
+    set (OPTIONS -Wall -Wextra -Wpedantic -Werror -O2)
+endif ()
+add_compile_options(${OPTIONS})
 
 #apps
 add_executable (main apps/main.cpp)

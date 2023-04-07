@@ -2,9 +2,7 @@
 #include "tree.hpp"
 #include "input_commands.hpp"
 
-#define DUMP_MODE
-
-#ifdef DUMP_MODE
+#ifdef DEBUG_MODE
     #include "dump.hpp"       
 #endif
 
@@ -36,7 +34,7 @@ int main() try {
     }
     std::cout << std::endl;
 
-    #ifdef DUMP_MODE
+    #ifdef DEBUG_MODE
         tree.dump("dump.dot");
         system ("dot dump.dot -T png -o dump.png");
     #endif
