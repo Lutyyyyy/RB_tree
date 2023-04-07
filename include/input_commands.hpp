@@ -9,7 +9,7 @@
 namespace input 
 {
 
-enum Commands {KEY = 'k', KTHMIN = 'm', NLESS = 'n'};
+enum Commands : char {KEY = 'k', KTHMIN = 'm', NLESS = 'n'};
 
 void handle_input_error() {
     std::cout << "Incorrect input" << std::endl;

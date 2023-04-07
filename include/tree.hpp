@@ -49,11 +49,10 @@ public:
 class RB_tree_t final {
 
 private:
-    Node_t *nil = nullptr;
     Node_t *root;
 
 public:    
-    RB_tree_t() : root(nil) {}
+    RB_tree_t() : root(nullptr) {}
 
     RB_tree_t(const RB_tree_t& rhs);
     RB_tree_t& operator=(const RB_tree_t& rhs);
@@ -62,7 +61,6 @@ public:
     ~RB_tree_t();
 
     const Node_t* get_root() const { return root; }
-    const Node_t* get_nil_ptr() const { return nil; }
 
     void insert (int key);
     void insert_fixup (Node_t* node);
@@ -118,7 +116,7 @@ void tree::Node_t::update_size() {
 }
 
 tree::RB_tree_t::RB_tree_t (const tree::RB_tree_t& rhs) {
-    root = new Node_t{rhs.root->key(), nil, nil, nil, Color_t::BLACK, rhs.root->size()};
+    root = new Node_t{rhs.root->key(), nullptr, nullptr, nullptr, Color_t::BLACK, rhs.root->size()};
     
     std::queue< std::pair<Node_t*, const Node_t*> > node_queue; //queue <tmp node, rhs node>
     node_queue.push(std::make_pair(root, rhs.root));
@@ -128,10 +126,10 @@ tree::RB_tree_t::RB_tree_t (const tree::RB_tree_t& rhs) {
         const Node_t* rhs_node = node_queue.front().second;
         node_queue.pop();
 
-        if (rhs_node->left != rhs.nil) {
+        if (rhs_node->left != nullptr) {
             node->left = new Node_t{rhs_node->left->key(), 
-                                    nil, 
-                                    nil, 
+                                    nullptr, 
+                                    nullptr, 
                                     node, 
                                     rhs_node->left->color(), 
                                     rhs_node->left->size()
@@ -139,10 +137,10 @@ tree::RB_tree_t::RB_tree_t (const tree::RB_tree_t& rhs) {
             node_queue.push(std::make_pair(node->left, rhs_node->left));
         }
 
-        if (rhs_node->right != rhs.nil) {
+        if (rhs_node->right != nullptr) {
             node->right = new Node_t{rhs_node->right->key(), 
-                                     nil, 
-                                     nil, 
+                                     nullptr, 
+                                     nullptr, 
                                      node, 
                                      rhs_node->right->color(), 
                                      rhs_node->right->size()
@@ -159,37 +157,37 @@ tree::RB_tree_t& tree::RB_tree_t::operator= (const tree::RB_tree_t& rhs) {
 }
 
 tree::RB_tree_t::RB_tree_t (tree::RB_tree_t&& rhs) noexcept : root(rhs.root) {
-    rhs.root = rhs.nil;
+    rhs.root = nullptr;
 }
 
 tree::RB_tree_t& tree::RB_tree_t::operator= (tree::RB_tree_t&& rhs) noexcept {
     std::swap(root, rhs.root);
-    rhs.root = rhs.nil;
+    rhs.root = nullptr;
     return *this;
 }
 
 tree::RB_tree_t::~RB_tree_t () {
     Node_t* ptr = root;
     
-    if (root == nil) return;
+    if (root == nullptr) return;
 
-    while (root->left != nil || root->right != nil) {
-        while (ptr->left != nil || ptr->right != nil) {
-            while (ptr->left != nil) 
+    while (root->left != nullptr || root->right != nullptr) {
+        while (ptr->left != nullptr || ptr->right != nullptr) {
+            while (ptr->left != nullptr) 
                 ptr = ptr->left;
-            if (ptr->right != nil)
+            if (ptr->right != nullptr)
                 ptr = ptr->right;
         }
 
         if (ptr == ptr->p->left) {
             ptr = ptr->p;
             delete ptr->left;
-            ptr->left = nil; 
+            ptr->left = nullptr; 
         }
         else if (ptr == ptr->p->right) {
             ptr = ptr->p;
             delete ptr->right;
-            ptr->right = nil; 
+            ptr->right = nullptr; 
         }
     }
     
@@ -198,10 +196,10 @@ tree::RB_tree_t::~RB_tree_t () {
 }
 
 void tree::RB_tree_t::insert (int key) {
-    Node_t* parent_node = nil;
+    Node_t* parent_node = nullptr;
     Node_t* current_node = root;
     
-    while (current_node != nil) {
+    while (current_node != nullptr) {
         parent_node = current_node;
         if (key < current_node->key())
             current_node = current_node->left;
@@ -209,9 +207,9 @@ void tree::RB_tree_t::insert (int key) {
             current_node = current_node->right;
     }
     
-    Node_t* node = new Node_t{key, nil, nil, parent_node, Color_t::RED};
+    Node_t* node = new Node_t{key, nullptr, nullptr, parent_node, Color_t::RED};
 
-    if (parent_node == nil)
+    if (parent_node == nullptr)
         root = node;
     else if (node->key() < parent_node->key()) {
         parent_node->left = node;
@@ -220,7 +218,7 @@ void tree::RB_tree_t::insert (int key) {
         parent_node->right = node;
     }
 
-    while (parent_node != nil) {
+    while (parent_node != nullptr) {
         parent_node->update_size();
         parent_node = parent_node->p;
     }
@@ -229,10 +227,10 @@ void tree::RB_tree_t::insert (int key) {
 }
 
 void tree::RB_tree_t::insert_fixup (tree::Node_t* node) {
-    while (node->p != nil && node->p->color() == Color_t::RED) {
+    while (node->p != nullptr && node->p->color() == Color_t::RED) {
         if (node->p == node->p->p->left) {
             Node_t* uncle = node->p->p->right;
-            if (uncle != nil && uncle->color() == Color_t::RED) {
+            if (uncle != nullptr && uncle->color() == Color_t::RED) {
                 node->p->update_color(Color_t::BLACK);
                 uncle->update_color(Color_t::BLACK);
                 node->p->p->update_color(Color_t::RED);
@@ -250,7 +248,7 @@ void tree::RB_tree_t::insert_fixup (tree::Node_t* node) {
         }
         else {
             Node_t* uncle = node->p->p->left;
-            if (uncle != nil && uncle->color() == Color_t::RED) {
+            if (uncle != nullptr && uncle->color() == Color_t::RED) {
                 node->p->update_color(Color_t::BLACK);
                 uncle->update_color(Color_t::BLACK);
                 node->p->p->update_color(Color_t::RED);
@@ -275,10 +273,10 @@ void tree::RB_tree_t::left_rotate (tree::Node_t* node) {
     Node_t* temp = node->right;
     node->right = temp->left;
 
-    if (temp->left != nil)
+    if (temp->left != nullptr)
         temp->left->p = node;
     temp->p = node->p;
-    if (node->p == nil)
+    if (node->p == nullptr)
         root = temp;
     else if (node == node->p->left)
         node->p->left = temp;
@@ -296,10 +294,10 @@ void tree::RB_tree_t::right_rotate (tree::Node_t* node) {
     Node_t* temp = node->left;
     node->left = temp->right;
 
-    if (temp->right != nil)
+    if (temp->right != nullptr)
         temp->right->p = node;
     temp->p = node->p;
-    if (node->p == nil)
+    if (node->p == nullptr)
         root = temp;
     else if (node == node->p->left)
         node->p->left = temp;
@@ -323,7 +321,7 @@ int tree::RB_tree_t::order_statistic (unsigned k) const {
 
     Node_t* current = root;
     unsigned left_half_size = 1;
-    if (current->left != nil)
+    if (current->left != nullptr)
         left_half_size += current->left->size();
 
     while (k != left_half_size) {
@@ -335,7 +333,7 @@ int tree::RB_tree_t::order_statistic (unsigned k) const {
             k -= left_half_size;
         }
 
-        if (current->left != nil)
+        if (current->left != nullptr)
             left_half_size += current->left->size();
         else
             left_half_size = 1;
@@ -348,9 +346,9 @@ unsigned tree::RB_tree_t::nKeys_less_than (int key) const {
     unsigned result = 0;
     Node_t* current = root;
     
-    while (current != nil) {    
+    while (current != nullptr) {    
         if (key == current->key()) {
-            if (current->left != nil) 
+            if (current->left != nullptr) 
                 result += current->left->size();
             break;
         }
@@ -359,7 +357,7 @@ unsigned tree::RB_tree_t::nKeys_less_than (int key) const {
         }
         else {
             result += 1;
-            if (current->left != nil) 
+            if (current->left != nullptr) 
                 result += current->left->size();
             current = current->right;
         }
